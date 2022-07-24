@@ -5,6 +5,7 @@ import { fileFromPath } from 'formdata-node/file-from-path'
 import { FormData } from 'formdata-node'
 import { convert } from '../libs/ffmpeg/wrapper.js'
 import logger from '../libs/logger.js'
+import got from 'got'
 
 const IPC_PATH = '/tmp/upload_vid.sock'
 const UPLOAD_ENDPOINT = process.env.SERVER_URL + '/upload'
@@ -34,17 +35,20 @@ const convertVid = async inputPath => {
 }
 
 const uploadVid = async inputPath => {
-  const { got } = await import('got')
   const form = new FormData()
 
   form.set('upload_file', await fileFromPath(inputPath))
 
-  got.post(UPLOAD_ENDPOINT, {
-    body: form
-  })
+  const { error, shareUrl } = await got.post(UPLOAD_ENDPOINT, {
+    body: form,
+    headers: {
+      Authorization: process.env.API_SECRET
+    }
+  }).json()
 
   return {
-    msg: '1'
+    error,
+    shareUrl
   }
 }
 
@@ -76,7 +80,7 @@ const handleConnection = socket => {
         error: true,
       }
 
-      logger.error('Internal err', e)
+      logger.error('Internal err', e.message, e.stack)
     }
 
     socket.write(JSON.stringify(response))

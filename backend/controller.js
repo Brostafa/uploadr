@@ -31,35 +31,35 @@ const genQualitiesInBg = async (uploadPath, id) => {
       const outputPath = path.join(uploadPath, outputFilename)
 
       if (quality < height) {
-        logger.info(`[Generate Quality] video height="${height}" qualityToMake="${quality}"`)
+        logger.info(`[Generate Quality] Starting id="${id}" video height="${height}" qualityToMake="${quality}"`)
+        const now = Date.now()
+
+        await convert({
+          inputPath,
+          outputPath,
+          fps: 30,
+          aspect: '16:9',
+          height: quality,
+        })
+
+        const { video: vidInfo } = await videoInfo(outputPath)
+        const { size } = await fsP.stat(outputPath)
+        // q1080, q720, q576
+        const qualityKey = 'q' + quality
+        Videos[id].qualities[qualityKey] = {
+          filename: path.basename(outputPath),
+          size,
+          ...vidInfo
+        }
+
+        db.write()
+        logger.success(`[Generate Quality] Done id="${id}" outputFile="${path.basename(outputPath)}" execTime="${(Date.now() - now) / 1000} sec"`)
       }
-
-      await convert({
-        inputPath,
-        outputPath,
-        fps: 30,
-        aspect: '16:9',
-        height: quality,
-      })
-
-      const { video: vidInfo } = await videoInfo(outputPath)
-      const { size } = await fsP.stat(outputPath)
-      // q1080, q720, q576
-      const qualityKey = 'q' + quality
-      Videos[id].qualities[qualityKey] = {
-        filename: path.basename(outputPath),
-        size,
-        ...vidInfo
-      }
-
-      db.write()
     }
   } catch (e) {
     logger.error('[Generate Qualities]', e)
   }
 }
-
-genQualitiesInBg('/Users/mostafahefny/Desktop/Computer/personal/projects/video-sharing/public/uploads', 'zmSAvZy0D')
 
 export const handleUpload = (uploadPath) => async (req, res) => {
   try {
@@ -70,12 +70,12 @@ export const handleUpload = (uploadPath) => async (req, res) => {
 
     if (!ALLOWED_EXTS.includes(ext)) {
       return res.send({
-        ok: false,
         error: `Bad extension. ext="${ext}"`
       })
     }
 
     await fsP.rename(oldpath, newpath)
+
     const { video: vidInfo } = await videoInfo(newpath)
 
     Videos[id] = {
@@ -95,11 +95,10 @@ export const handleUpload = (uploadPath) => async (req, res) => {
     genQualitiesInBg(uploadPath, id)
 
     res.send({
-      ok: true
+      shareUrl: process.env.SERVER_URL + `/w/${id}`
     })
   } catch (e) {
     res.send({
-      ok: false,
       error: e.message
     })
 

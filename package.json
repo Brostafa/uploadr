@@ -7,7 +7,8 @@
   "scripts": {
     "dev:backend": "nodemon backend/app.js --ignore db.json",
     "dev:mac_server": "nodemon mac_server/comm-sock.js  --ignore db.json",
-    "dev": "concurrently --kill-others \"yarn dev:backend\" \"yarn dev:mac_server\" --names=api,mac_server"
+    "dev": "concurrently --kill-others \"yarn dev:backend\" \"yarn dev:mac_server\" --names=api,mac_server",
+    "lint": "eslint . --config .eslintrc.json --fix --max-warnings=0"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",

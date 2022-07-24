@@ -27,7 +27,20 @@ app.engine('hbs', hbs.express4())
 app.set('view engine', 'hbs')
 app.set('views', __dirname + '/views')
 
-app.post('/upload', upload.single('upload_file'), handleUpload(uploadsPath))
+/** Public Routes */
 app.get('/w/:id', handleWatch())
+
+/** Protected Routes */
+app.use((req, res, next) => {
+  const isValidKey = req.headers.authorization === process.env.API_SECRET
+
+  if (isValidKey) {
+    next()
+  } else {
+    res.sendStatus(401)
+  }
+})
+
+app.post('/upload', upload.single('upload_file'), handleUpload(uploadsPath))
 
 app.listen(PORT, () => logger.info('Listening on port', PORT))
