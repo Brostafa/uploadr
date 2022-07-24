@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watch - {{ name }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.2/plyr.min.css" integrity="sha512-1EV4ofS7XcLAlzTrHHfhk7UzxVEY8Qog2Jeve5UhGYrFm2BQylunV46RXUa5JJilEAmIAtIA2KbFxISjVmw+zg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    html {
+      background-color: #000;
+      color: #fff;
+    }
+
+    body {
+      padding: 25px;
+    }
+
+    video {
+      max-width: 100%;
+      max-height: calc(100vh - 200px);
+      min-height: 350px;
+    }
+
+    h1 {
+      margin: 0
+    }
+  </style>  
+</head>
+<body>
+  <h1>{{ name }}</h1>
+  <video id="player" playsinline controls>
+    <source src="" type="video/mp4" />
+  </video>
+  <span>
+    File size:
+
+    <span id="size"></span>
+  </span>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.2/plyr.min.js" integrity="sha512-5c+ic1AaqQ73rhjELeXI19EFx9KWd/LPFZ91ztP4x+MaufkHnpSEuLHcE6KwGn6G6I+ScYkSPONmrdGQh1GjiA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    const dataFromBackend = {{{ jsonToFrontend }}}
+    const { qualities } = dataFromBackend || {}
+    const originalQuality = qualities.original.height
+    const $video = document.querySelector('#video')
+    const $size = document.querySelector('#size')
+    const player = new Plyr('#player', {
+      seekTime: 5,
+      quality: {
+        default: originalQuality,
+        options: [originalQuality, 4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240]
+      }
+    })
+
+    const setSize = size => {
+      const sizeInMb = size / 1024 / 1024
+      const roundedSize = Math.round(sizeInMb * 1000) / 1000
+
+      $size.textContent = roundedSize + ' MB'
+    }
+
+    const getSources = () => {
+      return Object.keys(qualities).map(key => {
+        const { filename } = qualities[key]
+
+        return {
+          src: '/uploads/' + filename,
+          type: 'video/' + filename.split('.')[1],
+          // Handle { 'original': {}, 'q1080': {}, 'q720': {}, }
+          size: key.startsWith('q') ? Number(key.replace('q', '')) : originalQuality,
+        }
+      })
+    }
+
+    setSize(qualities.original.size)
+
+    player.source = {
+      type: 'video',
+      sources: getSources(),
+    }
+
+    player.quality = originalQuality
+  </script>
+</body>
+</html>
