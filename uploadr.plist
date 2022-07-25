@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>uploadr</string>
+
+    <key>OnDemand</key>
+    <false/>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/mostafahefny/.nvm/versions/node/v16.16.0/bin/node</string>
+        <string>/Users/mostafahefny/.shortcuts/uploadr/uploadr-sock.js</string>
+    </array>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/mostafahefny/.shortcuts/uploadr/output.log</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/mostafahefny/.shortcuts/uploadr/output.log</string>
+</dict>
+</plist>
