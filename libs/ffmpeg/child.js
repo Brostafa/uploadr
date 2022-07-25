@@ -44,6 +44,15 @@ const info = ({ inputPath }) => new Promise((resolve, reject) => {
   })
 })
 
+const getThumbnail = ({ inputPath, outputPath }) => new Promise((resolve, reject) => {
+  ffmpeg(inputPath)
+    .frames(1)
+    .output(outputPath)
+    .on('error', reject)
+    .on('end', () => resolve(outputPath))
+    .run()
+})
+
 process.once('message', async parentJson => {
   let messageToParent
 
@@ -52,6 +61,7 @@ process.once('message', async parentJson => {
     const actionMap = {
       'convert': convert,
       'info': info,
+      'getThumbnail': getThumbnail
     }
 
     if (actionMap[action]) {

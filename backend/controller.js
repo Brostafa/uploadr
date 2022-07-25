@@ -1,9 +1,9 @@
-import db from './db.js'
 import { generate as genId } from 'shortid'
 import fs from 'fs'
-import logger from '../libs/logger.js'
 import path from 'path'
-import { info as videoInfo, convert } from '../libs/ffmpeg/wrapper.js'
+import db from './db.js'
+import logger from '../libs/logger.js'
+import { info as videoInfo, convert, getThumbnail } from '../libs/ffmpeg/wrapper.js'
 
 const fsP = fs.promises
 const { videos: Videos } = db.data
@@ -61,7 +61,14 @@ const genQualitiesInBg = async (uploadPath, id) => {
   }
 }
 
-export const handleUpload = (uploadPath) => async (req, res) => {
+const getServerLink = ({ publicPath, filepath }) => {
+  const relativeFilepath = filepath.replace(publicPath, '')
+  const serverLink = process.env.SERVER_URL + relativeFilepath
+
+  return serverLink
+}
+
+export const handleUpload = (publicPath, uploadPath) => async (req, res) => {
   try {
     const { path: oldpath, originalname, size } = req.file
     const ext = path.extname(originalname)
@@ -77,10 +84,24 @@ export const handleUpload = (uploadPath) => async (req, res) => {
     await fsP.rename(oldpath, newpath)
 
     const { video: vidInfo } = await videoInfo(newpath)
+    const { width, height } = vidInfo
+    const { outputPath: thumbnailPath } = await getThumbnail({
+      inputPath: newpath,
+      desiredOutputPath: newpath.replace(ext, '.jpg')
+    })
+
+    const videoUrl = process.env.SERVER_URL + `/w/${id}`
+    const thumbnailUrl = getServerLink({ publicPath, filepath: thumbnailPath })
 
     Videos[id] = {
       id,
       name: originalname.split('.')[0],
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      videoUrl,
+      thumbnailUrl,
+      width,
+      height,
       qualities: {
         'original': {
           filename: path.basename(newpath),
@@ -111,10 +132,23 @@ export const handleWatch = () => async (req, res) => {
 
   if (id in Videos) {
     const video = Videos[id]
-    const { name, qualities } = video
+    const {
+      name,
+      qualities,
+      width,
+      height,
+      updatedAt,
+      thumbnailUrl,
+      videoUrl,
+    } = video
 
     return res.render('watch', {
       name,
+      width,
+      height,
+      updatedAt,
+      thumbnailUrl,
+      videoUrl,
       jsonToFrontend: JSON.stringify({
         qualities
       })

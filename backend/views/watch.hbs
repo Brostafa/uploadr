@@ -4,7 +4,37 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:site_name" content="iStafa Uploadr">
+  <meta property="og:url" content="{{ videoUrl }}">
+  <meta property="og:type" content="video">
+  <meta property="og:title" content="{{ name }}">
+  <meta property="og:description" content="Video '{{ name }}' uploaded to Uploadr by iStafa">
+  <meta property="og:updated_time" content="{{ updatedAt }}">
+  <meta property="og:image" content="{{ thumbnailUrl }}">
+  <meta property="og:image:secure_url" content="{{ thumbnailUrl }}">
+  <meta property="og:image:type" content="image/jpg">
+  <meta property="og:image:width" content="{{ width }}">
+  <meta property="og:image:height" content="{{ height }}">
+  <meta property="og:video" content="{{ videoUrl }}">
+  <meta property="og:video:type" content="video/mp4">
+  <meta property="og:video:width" content="{{ width }}">
+  <meta property="og:video:height" content="{{ height }}">
+  <meta property="og:site_name" content="iStafa">
+  <meta property="al:ios:app_name" content="iStafa Uploadr">
+  <meta property="al:android:app_name" content="iStafa Uploadr">
+  <meta name="description" content="Video '{{ name }}' uploaded to Uploadr by iStafa">
+  <meta name="twitter:card" content="player">
+  <meta name="twitter:title" content="{{ name }}">
+  <meta name="twitter:description" content="Video '{{ name }}' uploaded to Uploadr by iStafa">
+  <meta name="twitter:image" content="{{ thumbnailUrl }}">
+  <meta name="twitter:player" content="{{ videoUrl }}">
+  <meta name="twitter:player:width" content="{{ width }}">
+  <meta name="twitter:player:height" content="{{ height }}">
+  <meta name="twitter:app:name:iphone" content="iStafa Uploadr">
+  <meta name="twitter:app:name:ipad" content="iStafa Uploadr">
+  <meta name="twitter:app:name:googleplay" content="iStafa Uploadr">
   <title>Watch - {{ name }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha512-NhSC1YmyruXifcj/KFRWoC561YpHpc5Jtzgvbuzx5VozKpWvQ+4nXhPdFgmx8xqexRcpAglTj9sIBWINXa8x5w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/plyr/3.7.2/plyr.min.css" integrity="sha512-1EV4ofS7XcLAlzTrHHfhk7UzxVEY8Qog2Jeve5UhGYrFm2BQylunV46RXUa5JJilEAmIAtIA2KbFxISjVmw+zg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     html {
@@ -15,6 +45,10 @@
     body {
       padding: 25px;
     }
+    .plyr.plyr--full-ui {
+      max-height: calc(100vh - 130px);
+      min-height: 250px;
+    }
     h1 {
       margin: 0
     }
@@ -22,7 +56,7 @@
 </head>
 <body>
   <h1>{{ name }}</h1>
-  <video id="player" playsinline controls>
+  <video id="player" playsinline controls data-poster="{{ thumbnailUrl }}">
     <source src="" type="video/mp4" />
   </video>
   <span>

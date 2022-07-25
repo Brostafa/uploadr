@@ -83,6 +83,7 @@ const handleConnection = socket => {
       logger.error('Internal err', e.message, e.stack)
     }
 
+    logger.info('Processed ->', response)
     socket.write(JSON.stringify(response))
     socket.end()
   }

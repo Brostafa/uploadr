@@ -88,3 +88,14 @@ export const info = async inputPath => {
     audio
   }
 }
+
+export const getThumbnail = async ({ inputPath, desiredOutputPath }) => {
+  const outputPath = await sendToChild('getThumbnail', {
+    inputPath,
+    outputPath: desiredOutputPath,
+  })
+
+  return {
+    outputPath
+  }
+}

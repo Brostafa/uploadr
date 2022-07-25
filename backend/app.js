@@ -41,6 +41,6 @@ app.use((req, res, next) => {
   }
 })
 
-app.post('/upload', upload.single('upload_file'), handleUpload(uploadsPath))
+app.post('/upload', upload.single('upload_file'), handleUpload(publicPath, uploadsPath))
 
 app.listen(PORT, () => logger.info('Listening on port', PORT))
